@@ -14,12 +14,12 @@ timezone: Europe/London
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: Bree² Tech # the main title
+title: "Bree² Tech - Tech Insights and Solutions"
 
 tagline: Modern day Alchemist. Turning bits and bytes into gold # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
-  Learn, explore, and innovate with Sr. Dan, a modern-day alchemist transforming technology.
+  Learn, explore, and innovate with Sr. Dan, a modern-day alchemist transforming technology. Insights and solutions on tech, Linux, cloud, cybersecurity, and more.
 keywords: ["Tech Blogs", "Sr. Dan", "Coding", "Jekyll", "Alchemist", "Technology Insights", "Cybersecurity", "Cloud", "AWS", "Azure", "GCP", "Oracle", "Linux", "Windows"]
 
 # Fill in the protocol & hostname for your site.
@@ -43,7 +43,7 @@ social:
 
 # Site Verification Settings
 webmaster_verifications:
-  google: # fill in your Google verification code
+  google: google-site-verification=KhswfUSClHzaQkbXClmW3HllcJKjhaIg-rowT3z20YY
   bing: # fill in your Bing verification code
   alexa: # fill in your Alexa verification code
   yandex: # fill in your Yandex verification code
@@ -116,15 +116,15 @@ comments:
     issue_term: # < url | pathname | title | ...>
   # Giscus options › https://giscus.app
   giscus:
-    repo: # <gh-username>/<repo>
-    repo_id:
-    category:
-    category_id:
-    mapping: # optional, default to 'pathname'
-    strict: # optional, default to '0'
-    input_position: # optional, default to 'bottom'
-    lang: # optional, default to the value of `site.lang`
-    reactions_enabled: # optional, default to the value of `1`
+    repo: sto0ka/blog
+    repo_id: R_kgDONPl-yA
+    category: General
+    category_id: DIC_kwDONPl-yM4Cksi6
+    mapping: pathname
+    strict: 1
+    input_position: top
+    lang: en
+    reactions_enabled: 1
 
 # Self-hosted static assets, optional › https://github.com/cotes2020/chirpy-static-assets
 assets:

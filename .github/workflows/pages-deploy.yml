@@ -2,13 +2,13 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [ "main", "master" ]   # remove "master" if you don't use it
+    branches: [ "main", "master" ]
     paths-ignore:
       - .gitignore
       - README.md
       - LICENSE
   pull_request:
-    branches: [ "main" ]             # build & test on PRs, but won’t deploy
+    branches: [ "main" ]
     paths-ignore:
       - .gitignore
       - README.md
@@ -21,15 +21,16 @@ permissions:
   pages: write
   id-token: write
 
-# Avoid overlapping deploys
+# Smarter concurrency: per ref + event
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,7 +44,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: .ruby-version   # <- read from file you added
+          ruby-version: .ruby-version   # read from file in repo root
           bundler-cache: true
 
       - name: Install dependencies
@@ -61,13 +62,13 @@ jobs:
             --ignore-urls "/^http:\/\/127\.0\.0\.1/,/^http:\/\/0\.0\.0\.0/,/^http:\/\/localhost/"
 
       - name: Upload site artifact
-        if: github.event_name != 'pull_request'   # don't upload for PR builds
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: "_site${{ steps.pages.outputs.base_path }}"
 
   deploy:
-    if: github.event_name != 'pull_request'       # only deploy on push / manual
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     environment:

@@ -1,43 +1,68 @@
-# Chirpy Starter
+# Bree² Tech Blog 🧪💻
 
-[![Gem Version](https://img.shields.io/gem/v/jekyll-theme-chirpy)][gem]&nbsp;
-[![GitHub license](https://img.shields.io/github/license/cotes2020/chirpy-starter.svg?color=blue)][mit]
+[![Build and Deploy](https://github.com/sto0ka/blog/actions/workflows/pages-deploy.yml/badge.svg)](https://github.com/sto0ka/blog/actions/workflows/pages-deploy.yml)
+[![GitHub Pages](https://img.shields.io/badge/pages-live-brightgreen?logo=github)](https://breesquared.com)
+[![Made with Jekyll](https://img.shields.io/badge/Made%20with-Jekyll-red?logo=jekyll)](https://jekyllrb.com/)
 
-When installing the [**Chirpy**][chirpy] theme through [RubyGems.org][gem], Jekyll can only read files in the folders
-`_data`, `_layouts`, `_includes`, `_sass` and `assets`, as well as a small part of options of the `_config.yml` file
-from the theme's gem. If you have ever installed this theme gem, you can use the command
-`bundle info --path jekyll-theme-chirpy` to locate these files.
+Welcome to the source for **[Bree² Tech](https://breesquared.com)** —  
+a blog where Sr. Dan (aka *Modern-Day Alchemist*) shares insights on Linux, cloud, security, and everything tech.
 
-The Jekyll team claims that this is to leave the ball in the user’s court, but this also results in users not being
-able to enjoy the out-of-the-box experience when using feature-rich themes.
+This site is built with [Jekyll](https://jekyllrb.com/) and the [Chirpy theme](https://github.com/cotes2020/jekyll-theme-chirpy), and deployed automatically with GitHub Pages.
 
-To fully use all the features of **Chirpy**, you need to copy the other critical files from the theme's gem to your
-Jekyll site. The following is a list of targets:
+---
 
-```shell
-.
-├── _config.yml
-├── _plugins
-├── _tabs
-└── index.html
+## ✨ Features
+- ⚡️ Static site powered by **Jekyll 4**
+- 🎨 Clean and modern **Chirpy theme**
+- 💬 Comment system via **[Giscus](https://giscus.app/)**
+- 🔍 SEO meta tags, sitemap, and analytics hooks
+- 📱 Progressive Web App (PWA) support
+- ✅ CI/CD with GitHub Actions (`pages-deploy.yml`)
+- 🔒 Security maintained with Dependabot + CodeQL
+
+---
+
+## 🚀 Local Development
+
+Clone the repo and run it locally:
+
+```bash
+# Install Ruby (>= 3.3.x) and Bundler
+bundle install
+
+# Build and serve locally
+bundle exec jekyll serve
 ```
 
-To save you time, and also in case you lose some files while copying, we extract those files/configurations of the
-latest version of the **Chirpy** theme and the [CD][CD] workflow to here, so that you can start writing in minutes.
+Then open [http://localhost:4000](http://localhost:4000) in your browser.
 
-## Usage
+---
 
-Check out the [theme's docs](https://github.com/cotes2020/jekyll-theme-chirpy/wiki).
+## 🛠️ Project Structure
+- `_posts/` → blog posts (Markdown, with front matter)
+- `_config.yml` → site configuration
+- `Gemfile` / `Gemfile.lock` → Ruby gems
+- `.github/workflows/` → GitHub Actions for CI/CD
+- `.ruby-version` → pinned Ruby version for local + CI
 
-## Contributing
+---
 
-This repository is automatically updated with new releases from the theme repository. If you encounter any issues or want to contribute to its improvement, please visit the [theme repository][chirpy] to provide feedback.
+## 🧑‍💻 Contributing
+Pull requests are welcome!  
+For major changes, please open an issue first to discuss what you’d like to change.
 
-## License
+**Setup steps for contributors:**
+1. Fork this repo
+2. Clone your fork and run `bundle install`
+3. Start the server: `bundle exec jekyll serve`
+4. Commit your changes and open a PR 🚀
 
-This work is published under [MIT][mit] License.
+---
 
-[gem]: https://rubygems.org/gems/jekyll-theme-chirpy
-[chirpy]: https://github.com/cotes2020/jekyll-theme-chirpy/
-[CD]: https://en.wikipedia.org/wiki/Continuous_deployment
-[mit]: https://github.com/cotes2020/chirpy-starter/blob/master/LICENSE
+## 🔒 Security
+See [SECURITY.md](./SECURITY.md) for details on how to report vulnerabilities.
+
+---
+
+## 📜 License
+This project is open source under the [MIT License](./LICENSE).

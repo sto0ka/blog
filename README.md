@@ -59,10 +59,5 @@ For major changes, please open an issue first to discuss what you’d like to ch
 
 ---
 
-## 🔒 Security
-See [SECURITY.md](./SECURITY.md) for details on how to report vulnerabilities.
-
----
-
 ## 📜 License
 This project is open source under the [MIT License](./LICENSE).

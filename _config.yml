@@ -182,3 +182,7 @@ jekyll-archives:
 
 plugins:
   - jekyll-sitemap
+
+# Load custom JS globally
+scripts:
+  - /assets/js/mermaid.js

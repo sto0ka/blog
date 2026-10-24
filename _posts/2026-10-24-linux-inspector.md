@@ -9,11 +9,11 @@ A server can be healthy and still be a mystery.
 
 You can see that nginx is running. There is a Java process, a database, a few containers and several custom systemd units. Nobody is quite sure which application owns a port, whether a scheduled job still matters, or where a configuration change needs to go so it survives the next deployment.
 
-That is the problem I started **linux-inspector** to investigate. It collects evidence from a Linux machine and builds a report about what the machine does, how its services connect, where its data lives and how it is managed. It can then join several host reports into a fleet map.
+I’m building **linux-inspector** to make that investigation easier. It collects evidence from a Linux machine and builds a report about what the machine does, how its services connect, where its data lives and how it is managed. It can then join several host reports into a fleet map.
 
-The useful question is less "what packages are installed?" and more "what would I need to understand before taking responsibility for this box?"
+I wanted a tool that could help me answer "what does this box do?" without spending the first hour stitching together command output by hand.
 
-The examples below use synthetic test machines. Hostnames, domains, application names and topology are illustrative; they are not a map of a live environment. The project is currently at version **0.1.0**, so this is a look at the working tool and its limits, not a claim that discovery is solved.
+The project is at **0.1.0**. This post walks through what I’ve built so far, how I use it and where I want to take it next. All examples use synthetic test machines, with fictional hostnames, domains and application details.
 
 ## Following a request through the machine
 
@@ -35,7 +35,7 @@ The collector reads the proxy configuration, checks the listener and its owning 
 
 This helps answer practical questions: which unit would I inspect for a failed API, which logs belong to it, and would editing a local configuration file actually stick?
 
-That last question matters on a GitOps-managed host. Finding Flux or Argo CD sources is more useful than handing someone a list of Kubernetes objects they could edit and have immediately reconciled back.
+On a GitOps-managed host, I also want the report to point me to the Flux or Argo CD source. That gives me a place to make a lasting change.
 
 ## Evidence, then interpretation
 
@@ -63,13 +63,13 @@ Relationships carry a confidence label:
 | Inferred | Configuration or naming suggests the relationship, but it was not directly observed. |
 | Unknown | Something is referenced, but the scan could not establish the next step. |
 
-A confirmed local listener does not prove that an Internet client can reach it. A configured database hostname does not prove that the database is healthy. Those are different claims, and the report needs to keep them separate.
+I keep those labels attached to the relationships so I can follow up on an inferred dependency or a missing part of the chain. Listener discovery, network reachability and service health each answer a different question.
 
-The current summaries come from Python parsers and correlation rules. Running the tool does not require an LLM or a hosted model API. An optional model-assisted narrative layer is on the roadmap, not part of the current scan path.
+I’ve built the current summaries with Python parsers and correlation rules, so collection and reporting run locally without a model API.
 
 ## Trying it without touching a server
 
-These commands assume access to a project checkout. The regular package needs **Python 3.10 or newer**.
+From a project checkout, I set up the development environment like this. The regular package needs **Python 3.10 or newer**.
 
 ```bash
 cd linux-inspector
@@ -89,7 +89,7 @@ The repository includes fake filesystems and canned command output, so the colle
 
 Here `--sudo` enables the fixture's privileged view. It does not run a privileged scan of the workstation. `--sample-window 0` avoids waiting for the usual connection-sampling window.
 
-That fixture represents nginx in front of a systemd-managed FastAPI application, a local PostgreSQL instance and a Compose stack. In my example run it produced **68 entities, 87 relationships and 341 recorded operations**. Those numbers describe this test fixture, not a typical production server.
+That fixture represents nginx in front of a systemd-managed FastAPI application, a local PostgreSQL instance and a Compose stack. In my example run it produced **68 entities, 87 relationships and 341 recorded operations**. The fixture gives me a repeatable way to check how changes affect the report.
 
 The report is written to:
 
@@ -132,7 +132,7 @@ There are three collection depths:
 | `standard` | Adds deeper application and Kubernetes discovery, journal sampling and usage observations. |
 | `deep` | Wider source searches and additional environment/container-log inspection, with more material to review. |
 
-The standard connection-sampling window is **60 seconds**. That is an observation window, not the promised duration of the entire scan. A quiet listener during one minute may still be important overnight or at month end.
+The standard connection-sampling window is **60 seconds**, in addition to the other collection work. I use it to add a picture of activity during the scan, alongside the configured services and listeners.
 
 ## Taking the bundle to an offline machine
 
@@ -144,7 +144,7 @@ SSH is not always available. The project can build a single Python zip applicati
 
 The result is `dist/linux-inspector.pyz`. Building it needs dependencies on the build machine and may download its pinned vendored wheels; a prepared wheel directory can be supplied for an offline build. The finished bundle runs on **Python 3.6 or newer** without installing Python packages on the target.
 
-Once the bundle is on an approved machine, collection can be kept separate from analysis:
+On a machine I’m inspecting, I can collect first and analyze the saved evidence later:
 
 ```bash
 sudo python3 /path/to/linux-inspector.pyz scan \
@@ -152,7 +152,7 @@ sudo python3 /path/to/linux-inspector.pyz scan \
   -o /mnt/review/host-01
 ```
 
-The output location is explicit. This mode writes evidence where requested; it is not a zero-footprint execution mode. The regular package's Python requirement and the bundle's runtime requirement are different.
+I choose the evidence destination explicitly so I can carry the results back to my analysis machine. The bundle’s older Python support is useful for inspecting systems where I don’t want to install another runtime.
 
 Back on the analysis machine:
 
@@ -161,7 +161,7 @@ Back on the analysis machine:
 .venv/bin/linux-inspector import /mnt/review --fleet
 ```
 
-Import checks the recorded structure and output hashes, checks for known secret material and rejects symlinks before accepting evidence. Hashes help detect changes to recorded outputs; they are not a signed attestation that the source machine was trustworthy.
+The import workflow checks recorded output hashes and runs validation before rebuilding the analysis from the collected facts.
 
 ## From one box to a service map
 
@@ -188,7 +188,7 @@ Existing scans can be joined again without recollection:
 .venv/bin/linux-inspector fleet ./evidence
 ```
 
-The result includes a Markdown fleet report and Mermaid dependency diagrams. Its value depends on the evidence available from each machine; an inferred link does not become confirmed just because it appears in a diagram.
+The result includes a Markdown fleet report and Mermaid dependency diagrams, with the evidence and confidence labels carried through from the host reports.
 
 ## What gets saved
 
@@ -205,7 +205,7 @@ findings.json      Issues with classifications and evidence
 analysis.json      Summaries, traces and application profiles
 ```
 
-The operation IDs connect findings to the outputs behind them. If an application relationship looks wrong, there is a way to investigate the source rather than taking the prose on trust.
+I keep operation IDs with the findings so I can trace a relationship back to the output that produced it. That has been useful while developing parsers and checking a report against the fixture.
 
 For repeated work, I can reanalyze or replay saved evidence without reconnecting to the server:
 
@@ -218,15 +218,15 @@ For repeated work, I can reanalyze or replay saved evidence without reconnecting
   -o ./evidence/web-01-replay
 ```
 
-Neither command refreshes the facts from the live machine. Replay answers collection requests from previously recorded output; it cannot invent evidence that the original scan never collected.
+I use reanalysis while improving the reporting rules, and replay while working on collectors. Both work with the saved scan; I run a new collection when I need a fresh view of the host.
 
-## Read-only deserves an explanation
+## Keeping collection focused
 
-The collection path has a fixed command allowlist and checks for dangerous flags. It reads application code and scheduled scripts rather than executing them. Container files are inspected through the host's process filesystem rather than by running commands inside containers. Private-key material and several credential/data locations are excluded, and stored output passes through redaction.
+I designed the collection path around observation. It has a fixed command allowlist and checks command arguments before running them. Application code and scheduled scripts are read for context, and container files are inspected through the host’s process filesystem.
 
-There is no remediation mode. The operating guide may show a restart command for a human to use, but the scanner does not run that recommendation.
+The tool collects evidence and produces a report. I make any changes to the system separately, once I’ve worked out what belongs where.
 
-That still needs sensible boundaries. SSH and sudo can create audit records. Local collection writes evidence. Some otherwise observational system tools can create caches or first-run files; the roadmap records those side effects as work to resolve. Root access gives a much fuller picture, but it also makes reviewing the collection plan worthwhile.
+I can review the collection plan before a scan and check the recorded operations afterwards:
 
 ```bash
 .venv/bin/linux-inspector plan \
@@ -238,24 +238,26 @@ That still needs sensible boundaries. SSH and sudo can create audit records. Loc
   --check /tmp/inspector-demo
 ```
 
-The first command describes what that configuration may inspect. The second checks the recorded operations against those rules. My fixture run classified all 341 recorded operations without an unplanned operation. That is a check of the operation policy, not a general security certification.
+The first command describes what that configuration may inspect. The second checks a saved scan against those rules. This is also part of my development workflow when I add a collector or expand an existing one.
 
-The current redaction also has coverage gaps, so it is not a guarantee that every credential has been removed. Redaction is not the same as anonymization either. A report can still contain hostnames, addresses, repository URLs, usernames and enough topology to identify an environment. I would treat the whole evidence directory as sensitive, review any excerpt before sharing it and use synthetic examples for a public article like this one.
+Collection writes evidence to the chosen destination, and SSH, sudo and system tools can leave their usual logs or caches. I treat collected evidence as private operational data. Public examples in this post come from synthetic fixtures.
 
-## Where it has helped, and where it stops
+## What I find useful
 
-The immediate benefit is a better starting point for a takeover, migration or cleanup. I can find custom units among vendor services, follow a domain to its application, identify persistent data and see whether changes belong in Git, Compose or a hand-maintained unit.
+The main benefit for me is getting the pieces into one place. I can follow a domain to its application, find the unit that starts it, locate persistent data and see whether configuration belongs in Git, Compose or a local file.
 
-It has also been useful during a before-and-after review. A rescan found a new backup timer and upload script, while the managed Kubernetes workloads largely stayed the same. That distinction was useful: a clean GitOps reconciliation did not describe every host-level change.
+That makes several jobs easier:
 
-The same review showed why the output needs interpretation:
+- **Taking over a server:** start with a map of services and dependencies, then follow the evidence for the parts that need a closer look.
+- **Planning a migration:** identify application roots, startup configuration, databases and storage before moving anything.
+- **Investigating a problem:** use `trace` or `explain` to narrow the search to the application and its supporting services.
+- **Writing documentation:** use the host and fleet reports as a starting point, with paths and relationships already collected.
+- **Developing discovery rules:** replay saved fixtures and compare the results without repeatedly connecting to a server.
 
-- A TCP connection to SSH is not a successful login. The current code uses visible process/session evidence to separate attempts from logged-in clients when privileges allow it. Without process ownership, login state is less certain; authentication records remain an important cross-check.
-- Journal counts can include old setup failures after a service has been fixed. They need to be read alongside timestamps and current service state.
-- A backup destination stored in a shell variable can remain unresolved. A detected timer and script do not prove that a usable off-site backup exists.
-- Firewall analysis describes the host rules it could read. Cloud security lists, NSGs, upstream devices and some forwarding paths are outside that conclusion. Unprivileged scans also have a documented case where unreadable rules can look too permissive.
-- Support dates come from a built-in table. This is not a live vulnerability scan or proof that vendor-backported packages are unpatched.
+## What I’m working towards
 
-There is no dedicated `linux-inspector diff` command yet. Comparing two scans currently means reviewing their reports or structured files; the first-class diff command is roadmap work. The same applies to the optional model-based narrative layer and broader destination resolution.
+I’m continuing to improve how the tool follows configuration references and explains missing visibility. I also want a dedicated scan comparison command, so I can ask what changed between two collections and get a useful summary of services, dependencies and configuration changes.
 
-For me, the useful outcome is a report I can question: what was observed, what was inferred, and what still needs checking before I change the machine. That is a better handover than a list of running processes and somebody saying, "I think that box does the billing."
+At the moment, I compare the saved reports and structured files. A built-in `diff` workflow is the next step I’d like to make easier.
+
+That is the direction of linux-inspector: spend less time gathering the same clues by hand, and more time understanding the system I’m working on. I’m building it around the questions I ask when I sit down in front of an unfamiliar Linux machine.

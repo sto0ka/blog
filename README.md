@@ -11,6 +11,10 @@ This site is built with [Jekyll](https://jekyllrb.com/) and the [Chirpy theme](h
 
 ---
 
+## Homelab series
+
+The [two-site K3s homelab post](_posts/2026-10-08-7.md) was updated on 24 October 2026 with OCI and home-cluster Kubernetes monitoring, Grafana dashboard exports, the Discord event-macro repair, and the remaining backup/reliability work. Workload ideas are identified as proposals.
+
 ## ✨ Features
 - ⚡️ Static site powered by **Jekyll 4**
 - 🎨 Clean and modern **Chirpy theme**

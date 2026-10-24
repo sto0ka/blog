@@ -240,7 +240,7 @@ That still needs sensible boundaries. SSH and sudo can create audit records. Loc
 
 The first command describes what that configuration may inspect. The second checks the recorded operations against those rules. My fixture run classified all 341 recorded operations without an unplanned operation. That is a check of the operation policy, not a general security certification.
 
-Redaction is also not the same as anonymization. A report can still contain hostnames, addresses, repository URLs, usernames and enough topology to identify an environment. I would treat the whole evidence directory as sensitive, review any excerpt before sharing it and use synthetic examples for a public article like this one.
+The current redaction also has coverage gaps, so it is not a guarantee that every credential has been removed. Redaction is not the same as anonymization either. A report can still contain hostnames, addresses, repository URLs, usernames and enough topology to identify an environment. I would treat the whole evidence directory as sensitive, review any excerpt before sharing it and use synthetic examples for a public article like this one.
 
 ## Where it has helped, and where it stops
 

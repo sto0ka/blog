@@ -11,6 +11,10 @@ This site is built with [Jekyll](https://jekyllrb.com/) and the [Chirpy theme](h
 
 ---
 
+## Linux inspection project
+
+[linux-inspector: Working Out What a Linux Server Actually Does](_posts/2026-10-24-linux-inspector.md) introduces the project with synthetic examples, local/SSH/offline usage, evidence-backed reports and current limitations.
+
 ## Homelab series
 
 The [two-site K3s homelab post](_posts/2026-10-08-7.md) was updated on 24 October 2026 with Kubernetes monitoring, daily age-encrypted application backups, verified Cloudflare R2 copies, storage-usage alerts, SSH hardening at host and OCI network layers, and the remaining recovery tests. Workload ideas are identified as proposals.

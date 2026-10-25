@@ -1,6 +1,7 @@
 ---
 title: "linux-inspector: Working Out What a Linux Server Actually Does"
 date: 2026-10-24 12:00:00 +0800
+last_modified_at: 2026-10-25 00:00:00 +0800
 categories: [Linux, Projects]
 tags: [Linux, Python, SystemAdministration, Discovery, Documentation, Kubernetes]
 ---
@@ -110,6 +111,52 @@ I can also ask a narrower question:
 ```
 
 `trace` follows the request path. `explain` describes the application: its runtime, startup units, routes, configuration paths and dependencies. Both use the saved evidence, so I do not have to reconnect to a host for every follow-up question.
+
+## What a report looks like
+
+Here is an abridged example from the repository’s synthetic three-host fixture. I’ve shortened the headings and selected a few columns to fit the post. The generated report goes on to include the detailed inventory and evidence references.
+
+### At a glance
+
+**edge-01** is a virtual machine running Ubuntu 22.04.4 LTS. It serves three domains through nginx, with Ansible management markers in two configuration files.
+
+| Item | Result |
+|---|---|
+| Role | Reverse proxy / web front end |
+| Domains | api.example.com, blog.example.com, shop.example.com |
+| Web server | nginx 1.18.0 |
+| Monitoring | Zabbix agent 2 |
+| Management | Ansible markers in nginx configuration |
+
+### Web endpoints
+
+| Domain | Ports | Backend | Confidence |
+|---|---|---|---|
+| api.example.com | 80, 443 | 10.0.0.20:3000 | Inferred |
+| blog.example.com | 80, 443 | app-01.corp.example:8081 | Inferred |
+| shop.example.com | 80, 443 | 10.0.0.20:8080 | Inferred |
+
+### Operating guide: nginx
+
+- **Runs as:** `nginx.service`, active and enabled.
+- **Logs:** `journalctl -u nginx.service --since today` and `/var/log/nginx/access.log`.
+- **Configuration:** `/etc/nginx/nginx.conf` and `/etc/nginx/sites-enabled/`.
+- **Change via:** Ansible; the configuration files carry management markers.
+
+Commands in the operating guide are there for me to use when needed; the scan doesn’t run them.
+
+When I join all three fixture hosts, the fleet report follows the application through to its database:
+
+```text
+api.example.com
+  -> edge-01: nginx on 443
+  -> app-01: orders-api on 3000, managed by PM2
+  -> db-01: PostgreSQL on 5432
+```
+
+The host endpoint table records configuration-derived links as inferred. The fleet view adds the connections observed across the scanned hosts. That is the part I wanted to bring together: the service, its configuration, the way it is managed and the next system in the chain.
+
+[Download this sample report as Markdown]({{ '/assets/examples/linux-inspector-report-excerpt.md' | relative_url }}).
 
 ## Running a real collection
 

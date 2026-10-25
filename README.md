@@ -17,6 +17,17 @@ This site is built with [Jekyll](https://jekyllrb.com/) and the [Chirpy theme](h
 
 ## Homelab series
 
+Current deployed services:
+
+| Service | Site |
+|---|---|
+| **Paperless-ngx** | Home cluster; PostgreSQL, Valkey and encrypted backups |
+| Homepage | Cloud cluster; service portal |
+| Vikunja | Cloud cluster; task management |
+| Zabbix | Cloud cluster; monitoring and alerts |
+| Grafana | Cloud cluster; dashboards |
+
+
 The [two-site K3s homelab post](_posts/2026-10-08-7.md) was updated on 25 October 2026 with Kubernetes monitoring, daily age-encrypted application backups, verified Cloudflare R2 copies, storage-usage alerts, SSH hardening at host and OCI network layers, and the remaining recovery tests. Paperless/Homepage deployments, application checks and the resource/probe/update baseline are now included; optional workload ideas remain proposals.
 
 ## ✨ Features

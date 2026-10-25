@@ -17,7 +17,7 @@ This site is built with [Jekyll](https://jekyllrb.com/) and the [Chirpy theme](h
 
 ## Homelab series
 
-The [two-site K3s homelab post](_posts/2026-10-08-7.md) was updated on 24 October 2026 with Kubernetes monitoring, daily age-encrypted application backups, verified Cloudflare R2 copies, storage-usage alerts, SSH hardening at host and OCI network layers, and the remaining recovery tests. Workload ideas are identified as proposals.
+The [two-site K3s homelab post](_posts/2026-10-08-7.md) was updated on 25 October 2026 with Kubernetes monitoring, daily age-encrypted application backups, verified Cloudflare R2 copies, storage-usage alerts, SSH hardening at host and OCI network layers, and the remaining recovery tests. Paperless/Homepage deployments, application checks and the resource/probe/update baseline are now included; optional workload ideas remain proposals.
 
 ## ✨ Features
 - ⚡️ Static site powered by **Jekyll 4**

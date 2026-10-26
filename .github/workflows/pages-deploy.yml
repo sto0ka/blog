@@ -15,11 +15,9 @@ on:
       - LICENSE
   workflow_dispatch:
 
-# Least-privilege token for Pages
+# Builds only read source; deployment receives its own permissions.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 # Smarter concurrency: per ref + event
 concurrency:
@@ -28,28 +26,29 @@ concurrency:
 
 jobs:
   build:
-    # Ruby 3.3.9 has prebuilt binaries for 24.04; keep runner upgrades explicit.
+    # Keep runner upgrades explicit; Ruby patch releases are pinned separately.
     runs-on: ubuntu-24.04
     timeout-minutes: 20
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1
         with:
           ruby-version: .ruby-version   # read from file in repo root
           bundler-cache: true
 
-      - name: Install dependencies
-        run: bundle install --without development
+      - name: Test last-modified hook
+        run: ruby tools/test-lastmod-hook.rb
 
       - name: Build site
         env:
@@ -64,11 +63,14 @@ jobs:
 
       - name: Upload site artifact
         if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: "_site${{ steps.pages.outputs.base_path }}"
 
   deploy:
+    permissions:
+      pages: write
+      id-token: write
     if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-24.04
@@ -79,4 +81,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

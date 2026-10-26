@@ -37,7 +37,7 @@ The [two-site K3s homelab post](_posts/2026-10-08-7.md) was updated on 25 Octobe
 - 🔍 SEO meta tags, sitemap, and analytics hooks
 - 📱 Progressive Web App (PWA) support
 - ✅ CI/CD with GitHub Actions (`pages-deploy.yml`)
-- 🔒 Security maintained with Dependabot + CodeQL
+- Dependency updates through Dependabot; GitHub secret scanning and push protection enabled
 
 ---
 
@@ -46,7 +46,7 @@ The [two-site K3s homelab post](_posts/2026-10-08-7.md) was updated on 25 Octobe
 Clone the repo and run it locally:
 
 ```bash
-# Install Ruby (>= 3.3.x) and Bundler
+# Install the Ruby version in .ruby-version (currently 3.3.13) and Bundler
 bundle install
 
 # Build and serve locally
@@ -54,6 +54,17 @@ bundle exec jekyll serve
 ```
 
 Then open [http://localhost:4000](http://localhost:4000) in your browser.
+
+Before opening a pull request, run:
+
+```bash
+ruby tools/test-lastmod-hook.rb
+bash tools/test.sh
+```
+
+Actions are pinned to commit SHAs and maintained by Dependabot. Builds have read-only repository access; only the deployment job receives Pages and OIDC permissions. Review dependency updates against the current main branch and require passing build checks before merging.
+
+For diagrams, use Chirpy's built-in Mermaid support with `mermaid: true` in the post front matter. No separate Mermaid script loader is needed.
 
 ---
 
